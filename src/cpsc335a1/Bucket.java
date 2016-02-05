@@ -9,7 +9,7 @@ public class Bucket {
 	int localDepth;
 	int numCharsLeft;
 	int firstOpenSlot = 0;
-	static final int DEFAULT_BUCKET_SIZE = 128;
+	public static final int DEFAULT_BUCKET_SIZE = 128;
 	StringBuilder builder;
 	
 	public Bucket(int size, int depth)
@@ -19,7 +19,7 @@ public class Bucket {
 			slots = new char[size/2];
 		else
 		{
-			System.err.println("The number of bytes requested is not a power of 2. Setting bucket size to default (128 bytes).");
+			System.err.println("The number of bytes requested is not a multiple of 2. Setting bucket size to default (128 bytes).");
 			slots = new char[DEFAULT_BUCKET_SIZE];
 		}
 		
@@ -58,8 +58,12 @@ public class Bucket {
 	private void insert(int index, String adding)
 	{
 		if(indices.isEmpty())
+		{
 			indices.add(index);
-		
+			return;
+		}
+
+		boolean added = false;
 		
 		for(int i = 0; i < indices.size(); i++)
 		{	
@@ -68,10 +72,14 @@ public class Bucket {
 			if(comparing.compareTo(adding) > 0)
 			{
 				indices.add(i, index);
+				added = true;
 				break;
 			}
 				
 		}
+		
+		if(!added)
+			indices.add(index);
 		
 	}
 	
@@ -103,11 +111,12 @@ public class Bucket {
 		
 		insert(firstOpenSlot, toAdd);
 		
-		slots[firstOpenSlot] = (char)toAdd.length();
-		for(int i = firstOpenSlot + 1; i <= toAdd.length(); i++)
-			slots[i] = toAdd.charAt(i);
+		slots[firstOpenSlot++] = (char)toAdd.length();
+		int end = firstOpenSlot + 1 + toAdd.length();
+		for(int i = 0; i < toAdd.length(); i++)
+			slots[firstOpenSlot++] = toAdd.charAt(i);
 		
-		firstOpenSlot += toAdd.length() + 1;
+		//firstOpenSlot += toAdd.length() + 1;
 		numCharsLeft -= toAdd.length() + 1;
 		
 		return true;

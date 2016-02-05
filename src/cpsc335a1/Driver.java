@@ -3,12 +3,21 @@ package cpsc335a1;
 public class Driver {
 
 	public static void main(String[] args) {
-		char array[] = new char[5];
-		int num = 5;
 		
-		array[0] = (char)num;
-		if(array[0] == num)
-			System.out.println(array[0]);
+		Bucket tester = new Bucket(5, 1);
+		
+		tester.add("AAABC");
+		tester.add("AAA");
+		tester.add("AAAB");
+		tester.add("AA");
+		tester.add("A");
+		tester.add("AAAAA");
+		tester.add("AAAABB");
+		tester.add("B");
+		
+		
+		for(String s : tester.empty())
+			System.out.println(s);
 
 		
 	}
