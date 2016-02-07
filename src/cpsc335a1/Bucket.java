@@ -12,6 +12,15 @@ public class Bucket {
 	public static final int DEFAULT_BUCKET_SIZE = 128;
 	StringBuilder builder;
 	
+	public int getLocalDepth()
+	{
+		return localDepth;
+	}
+	public void incrementLocalDepth()
+	{
+		localDepth++;
+	}
+	
 	public Bucket(int size, int depth)
 	{
 		indices = new ArrayList<Integer>();
@@ -31,8 +40,10 @@ public class Bucket {
 	// Returns the index of the start of the string, or -1 if the string isn't present.
 	// TODO: Right now just does a linear search. After testing the insert to make sure
 	// 		 elements are inserted in order, should update this to do binary search.
-	public int search(String toFind)
+	public int[] linearSearch(String toFind)
 	{
+		int output[] = new int[2];
+		int probes = 0;
 		for(int index : indices)
 		{
 			int length = slots[index];
@@ -43,12 +54,44 @@ public class Bucket {
 			int end = i + length;
 			for(int j = 0; i < end; i++, j++)
 			{
+				probes++;
 				if(toFind.charAt(j) != slots[i])
 					break;
 			}
 			
 			if(i == end + 1)
-				return index;
+			{
+				output[0] = index;
+				output[1] = probes;
+				return output;
+			}
+		}
+		
+		output[0] = -1;
+		output[1] = probes;
+		return output;
+	}
+	
+	public int binarySearch(String toFind)
+	{
+		
+		String words[] = view();
+		int probes = 0;
+		
+		int beginning = 0;
+		int end = words.length - 1;	
+		
+		while(end >= beginning)
+		{
+			int middle = (beginning + end) / 2;
+			probes++;
+			int direction = words[middle].compareTo(toFind);
+			if(direction == 0)
+				return probes;
+			else if(direction > 0)
+				end = middle-1;
+			else
+				beginning = middle+1;
 		}
 		
 		return -1;
@@ -136,6 +179,20 @@ public class Bucket {
 		numCharsLeft = slots.length;
 		firstOpenSlot = 0;
 		indices.clear();
+		
+		return words;
+	}
+	
+	public String[] view()
+	{
+		String words[] = new String[indices.size()];
+		
+		int current = 0;
+		for(int i : indices)
+		{
+			words[current] = constructString(i);
+			current++;
+		}
 		
 		return words;
 	}
